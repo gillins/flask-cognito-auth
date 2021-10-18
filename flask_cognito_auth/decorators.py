@@ -93,6 +93,7 @@ def callback_handler(fn):
                         "CSRF state validation successfull. Login is successfull for AWS Cognito")
 
                 logger.info("Decode the access token from response.")
+                print('response', response.json())
                 verify(response.json()["access_token"])
                 id_token = verify(
                     response.json()["id_token"], response.json()["access_token"])
