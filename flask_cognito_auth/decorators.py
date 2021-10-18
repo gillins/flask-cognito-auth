@@ -97,6 +97,7 @@ def callback_handler(fn):
                 verify(response.json()["access_token"])
                 id_token = verify(
                     response.json()["id_token"], response.json()["access_token"])
+                print('id token', id_token)
 
                 username = None
                 email = None
