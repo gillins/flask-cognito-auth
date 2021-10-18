@@ -139,8 +139,8 @@ def callback_handler(fn):
                                email=email,
                                expires=id_token["exp"],
                                refresh_token=response.json()["refresh_token"],
-                               givenName,
-                               familyName)
+                               givenName=givenName,
+                               familyName=familyName)
         if not auth_success:
             error_uri = config.redirect_error_uri
             if error_uri:
