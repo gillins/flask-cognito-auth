@@ -93,11 +93,10 @@ def callback_handler(fn):
                         "CSRF state validation successfull. Login is successfull for AWS Cognito")
 
                 logger.info("Decode the access token from response.")
-                print('response', response.json())
                 verify(response.json()["access_token"])
                 id_token = verify(
                     response.json()["id_token"], response.json()["access_token"])
-                print('id token', id_token)
+                #print('id token', id_token)
 
                 username = None
                 email = None
@@ -126,13 +125,22 @@ def callback_handler(fn):
                 groups = None
                 if "cognito:groups" in id_token:
                     groups = id_token['cognito:groups']
+                    
+                givenName = None
+                familyName = None
+                if 'given_name' in id_token:
+                    givenName = id_token['given_name']
+                if 'family_name' in id_token:
+                    familyName = id_token['family_name']
 
                 update_session(username=username,
                                id=id_token["sub"],
                                groups=groups,
                                email=email,
                                expires=id_token["exp"],
-                               refresh_token=response.json()["refresh_token"])
+                               refresh_token=response.json()["refresh_token"],
+                               givenName,
+                               familyName)
         if not auth_success:
             error_uri = config.redirect_error_uri
             if error_uri:
@@ -145,7 +153,7 @@ def callback_handler(fn):
     return wrapper
 
 
-def update_session(username: str, id, groups, email: str, expires, refresh_token):
+def update_session(username: str, id, groups, email: str, expires, refresh_token, givenName, familyName):
     """
     Method to update the Flase Session object with the informations after
     successfull login.
@@ -163,6 +171,8 @@ def update_session(username: str, id, groups, email: str, expires, refresh_token
     session['email'] = email
     session['expires'] = expires
     session['refresh_token'] = refresh_token
+    session['given_name'] = givenName
+    session['family_name'] = familyName
 
 
 def verify(token: str, access_token: str = None):
@@ -208,7 +218,9 @@ def logout_handler(fn):
                        groups=None,
                        email=None,
                        expires=None,
-                       refresh_token=None)
+                       refresh_token=None,
+                       givenName=None,
+                       familyName=None)
         logger.info(
             "AWS Cognito Login, redirecting to AWS Cognito for logout and terminating sessions")
 
