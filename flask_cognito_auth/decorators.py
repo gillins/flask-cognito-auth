@@ -132,6 +132,7 @@ def callback_handler(fn):
                     givenName = id_token['given_name']
                 if 'family_name' in id_token:
                     familyName = id_token['family_name']
+                print(id_token.keys(), givenName, familyName)
 
                 update_session(username=username,
                                id=id_token["sub"],
