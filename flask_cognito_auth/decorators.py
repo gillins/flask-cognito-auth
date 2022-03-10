@@ -141,7 +141,8 @@ def callback_handler(fn):
                                expires=id_token["exp"],
                                refresh_token=response.json()["refresh_token"],
                                givenName=givenName,
-                               familyName=familyName)
+                               familyName=familyName,
+                               idToken=response.json()["id_token"])
         if not auth_success:
             error_uri = config.redirect_error_uri
             if error_uri:
@@ -154,7 +155,8 @@ def callback_handler(fn):
     return wrapper
 
 
-def update_session(username: str, id, groups, email: str, expires, refresh_token, givenName, familyName):
+def update_session(username: str, id, groups, email: str, expires, 
+    refresh_token, givenName, familyName, idToken):
     """
     Method to update the Flase Session object with the informations after
     successfull login.
@@ -174,6 +176,7 @@ def update_session(username: str, id, groups, email: str, expires, refresh_token
     session['refresh_token'] = refresh_token
     session['given_name'] = givenName
     session['family_name'] = familyName
+    session['id_token'] = idToken
 
 
 def verify(token: str, access_token: str = None):
@@ -221,7 +224,8 @@ def logout_handler(fn):
                        expires=None,
                        refresh_token=None,
                        givenName=None,
-                       familyName=None)
+                       familyName=None,
+                       idToken=None)
         logger.info(
             "AWS Cognito Login, redirecting to AWS Cognito for logout and terminating sessions")
 
