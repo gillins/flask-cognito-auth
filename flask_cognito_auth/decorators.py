@@ -8,6 +8,7 @@ part of AWS Cognito group. This helps application for authorization.
 
 import logging
 import json
+import datetime
 import requests
 from requests.auth import HTTPBasicAuth
 from functools import wraps
@@ -172,7 +173,10 @@ def update_session(username: str, id, groups, email: str, expires,
     session['id'] = id
     session['groups'] = groups
     session['email'] = email
-    session['expires'] = expires
+    if expires is None:
+        session['expires'] = expires
+    else:
+        session['expires'] = datetime.datetime.fromtimestamp(expires)
     session['refresh_token'] = refresh_token
     session['given_name'] = givenName
     session['family_name'] = familyName
@@ -235,3 +239,26 @@ def logout_handler(fn):
         res = redirect(aws_cognito_logout)
         return res
     return wrapper
+    
+def get_id_token_refresh_if_needed():
+    """
+    Helper function. Returns session['id_token'] if it hasn't expired
+    otherwise refreshes the token and updates session['id_token']
+    before returning.
+    """
+    now = datetime.datetime.now()
+    if session['expires'] <= now:
+        request_parameters = {'grant_type': 'refresh_token',
+                      'client_id': config.client_id,
+                      "redirect_uri": config.redirect_uri,
+                      'refresh_token': session['refresh_token']}
+        response = requests.post(config.jwt_code_exchange_uri,
+                                 data=request_parameters,
+                                 auth=HTTPBasicAuth(config.client_id,
+                                                    config.client_secret))
+        session['id_token'] = response.json()['id_token']
+        secs_until_expiry = response.json()['expires_in']
+        session['expires'] = now + datetime.timedelta(seconds=secs_until_expiry)
+
+    return session['id_token']
+    
