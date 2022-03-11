@@ -176,7 +176,7 @@ def update_session(username: str, id, groups, email: str, expires,
     if expires is None:
         session['expires'] = expires
     else:
-        session['expires'] = datetime.datetime.fromtimestamp(expires)
+        session['expires'] = datetime.datetime.fromtimestamp(expires, datetime.timezone.utc)
     session['refresh_token'] = refresh_token
     session['given_name'] = givenName
     session['family_name'] = familyName
@@ -246,8 +246,7 @@ def get_id_token_refresh_if_needed():
     otherwise refreshes the token and updates session['id_token']
     before returning.
     """
-    now = datetime.datetime.now()
-    print(now.tzinfo, session['expires'].tzinfo)
+    now = datetime.datetime.now(datetime.timezone.utc)
     if session['expires'] <= now:
         request_parameters = {'grant_type': 'refresh_token',
                       'client_id': config.client_id,
