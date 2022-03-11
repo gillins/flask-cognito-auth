@@ -247,7 +247,8 @@ def get_id_token_refresh_if_needed():
     before returning.
     """
     now = datetime.datetime.now(datetime.timezone.utc)
-    print(now, session['expires'])
+    import time
+    print(now, session['expires'], time.timezone)
     if session['expires'] <= now:
         print('refreshing token')
         request_parameters = {'grant_type': 'refresh_token',
