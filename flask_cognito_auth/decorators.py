@@ -249,6 +249,7 @@ def get_id_token_refresh_if_needed():
     """
     # not sure why we have to include the timezone
     now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=time.timezone)
+    print(session['expires'], now)
     if session['expires'] <= now:
         print('refreshing token for', session['username'])
         request_parameters = {'grant_type': 'refresh_token',
