@@ -246,7 +246,8 @@ def get_id_token_refresh_if_needed():
     otherwise refreshes the token and updates session['id_token']
     before returning.
     """
-    now = datetime.datetime.today()
+    now = datetime.datetime.now()
+    print(now.tzinfo, session['expires'].tzinfo)
     if session['expires'] <= now:
         request_parameters = {'grant_type': 'refresh_token',
                       'client_id': config.client_id,
