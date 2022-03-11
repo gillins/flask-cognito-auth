@@ -9,6 +9,7 @@ part of AWS Cognito group. This helps application for authorization.
 import logging
 import json
 import datetime
+import time
 import requests
 from requests.auth import HTTPBasicAuth
 from functools import wraps
@@ -246,8 +247,8 @@ def get_id_token_refresh_if_needed():
     otherwise refreshes the token and updates session['id_token']
     before returning.
     """
-    now = datetime.datetime.now(datetime.timezone.utc)
-    import time
+    # not sure why we have to include the timezone
+    now = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=time.timezone)
     print(now, session['expires'], time.timezone)
     if session['expires'] <= now:
         print('refreshing token')
