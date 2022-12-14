@@ -260,7 +260,7 @@ def get_id_token_refresh_if_needed():
         response = requests.post(config.jwt_code_exchange_uri,
                                  data=request_parameters,
                                  auth=HTTPBasicAuth(config.client_id,
-                                                    config.client_secret)
+                                                    config.client_secret))
         response_json = response.json()
         if 'id_token' not in response_json or 'expires_in' not in response_json:
             print(response_json)
