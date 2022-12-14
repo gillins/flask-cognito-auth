@@ -15,6 +15,7 @@ from requests.auth import HTTPBasicAuth
 from functools import wraps
 from flask import redirect
 from flask import request
+from flask import abort
 from jose import jwt
 from .config import Config
 from flask import session
@@ -259,9 +260,13 @@ def get_id_token_refresh_if_needed():
         response = requests.post(config.jwt_code_exchange_uri,
                                  data=request_parameters,
                                  auth=HTTPBasicAuth(config.client_id,
-                                                    config.client_secret))
-        session['id_token'] = response.json()['id_token']
-        secs_until_expiry = response.json()['expires_in']
+                                                    config.client_secret)
+        response_json = response.json()
+        if 'id_token' not in response_json or 'expires_in' not in response_json:
+            print(response_json)
+            abort(429)
+        session['id_token'] = response_json['id_token']
+        secs_until_expiry = response_json['expires_in']
         session['expires'] = now + datetime.timedelta(seconds=secs_until_expiry)
 
     return session['id_token']
