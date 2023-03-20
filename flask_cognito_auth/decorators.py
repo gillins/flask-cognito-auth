@@ -264,10 +264,13 @@ def get_id_token_refresh_if_needed():
         response_json = response.json()
         if 'id_token' not in response_json or 'expires_in' not in response_json:
             print(response_json)
-            abort(429)
+            raise ReloginRequired()
+            
         session['id_token'] = response_json['id_token']
         secs_until_expiry = response_json['expires_in']
         session['expires'] = now + datetime.timedelta(seconds=secs_until_expiry)
 
     return session['id_token']
     
+class ReloginRequired(Exception):
+    pass
