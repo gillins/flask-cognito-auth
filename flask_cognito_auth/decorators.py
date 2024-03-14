@@ -36,8 +36,15 @@ def login_handler(fn):
     """
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        aws_cognito_login = config.login_uri
-
+        #aws_cognito_login = config.login_uri
+        state = request.args.get('state')
+        state_val = ''
+        if state is not None:
+            state_val = f"&state={state}"
+        aws_cognito_login = (f"{config.domain}/authorize?client_id={config.client_id}"
+                f"&response_type=code{state_val}"
+                f"&redirect_uri={config.redirect_uri}")
+                
         # https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-with-identity-providers.html
         res = redirect(aws_cognito_login)
         logger.info("Got Cognito Login, redirecting to AWS Cognito for Auth")
